@@ -1,0 +1,15 @@
+module.exports = {
+  UserExists: 'username already exists',
+  UserSuccessLogin: 'user logged in successfully',
+  IncorrectLogin: 'wrong user credentials',
+  UserLogout: 'user logged out',
+  UserNotAuthorized: 'this user is not authorized',
+  VerificationCodeHasSent: 'verification code has been sent',
+  EmailVerifiedSuccess: 'email successfully verified',
+  EmailFailedVerify: 'email not verify',
+  EmailAlreadyVerified: 'email already verified',
+  VerificationTokenWrong: 'wrong verification code',
+  VerificationTokenIsExpired: 'verification code expired',
+  EmailAlreadyExists: 'email already exists',
+  UserNameAlreadyExists: 'username already exists',
+};
