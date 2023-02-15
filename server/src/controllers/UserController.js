@@ -1,9 +1,19 @@
 const { UserServices } = require('../services');
 const bcrypt = require('bcrypt');
 const userServices = new UserServices('User');
+const { NotFound } = require('../utils/error-handler/Exceptions');
+const {
+  DataNotFound,
+  DataSuccessUpdate,
+  DataFailedUpdate,
+  DataSuccessDelete,
+  DataFailedDelete,
+  DataSuccessRestored,
+  DataFailedRestored,
+} = require('../utils/constants');
 
 module.exports = {
-  async findAll(req, res) {
+  async findAll(req, res, next) {
     try {
       const users = await userServices.getAllData();
       return res.status(200).json({
@@ -11,17 +21,20 @@ module.exports = {
         return: users,
       });
     } catch (error) {
-      return res.status(500).json({ success: false, error });
+      next(error);
     }
   },
 
-  async findById(req, res) {
+  async findById(req, res, next) {
     try {
       const { userId } = req.params;
-
       const user = await userServices.getOneData({
         id: userId,
       });
+
+      if (!user) {
+        throw new NotFound(DataNotFound);
+      }
 
       return res.status(200).json({
         success: true,
@@ -30,11 +43,11 @@ module.exports = {
         },
       });
     } catch (error) {
-      return res.status(500).json({ success: false, error });
+      next(error);
     }
   },
 
-  async store(req, res) {
+  async store(req, res, next) {
     try {
       const { email, password } = req.body;
 
@@ -48,11 +61,11 @@ module.exports = {
         return: newUser,
       });
     } catch (error) {
-      return res.status(500).json({ success: false, error });
+      next(error);
     }
   },
 
-  async update(req, res) {
+  async update(req, res, next) {
     try {
       const { userId } = req.params;
       const { email } = req.body;
@@ -64,38 +77,40 @@ module.exports = {
 
       return res.status(200).json({
         success: updatedUser[0] ? true : false,
-        return: updatedUser[0] ? 'Atualizado' : 'Não atualizado',
+        return: updatedUser[0] ? DataSuccessUpdate : DataFailedUpdate,
       });
     } catch (error) {
-      return res.status(500).json({ success: false, error });
+      next(error);
     }
   },
 
-  async delete(req, res) {
+  async delete(req, res, next) {
     try {
       const { userId } = req.params;
       const deletedUser = await userServices.deleteOneData(userId);
       return res.status(200).json({
         success: deletedUser ? true : false,
-        return: deletedUser ? 'Deletado' : 'Não deletado',
+        return: deletedUser ? DataSuccessDelete : DataFailedDelete,
       });
     } catch (error) {
-      return res.status(500).json({ success: false, error });
+      next(error);
     }
   },
 
-  async restore(req, res) {
+  async restore(req, res, next) {
     try {
       const { userId } = req.params;
       const restoredUser = await userServices.restoreData(userId);
       return res.status(200).json({
         success: restoredUser ? true : false,
         return: {
-          message: restoredUser ? 'Restaurado' : 'Não restaurado',
+          message: restoredUser
+            ? DataSuccessRestored
+            : DataFailedRestored,
         },
       });
     } catch (error) {
-      return res.status(500).json({ success: false, error });
+      next(error);
     }
   },
 };
