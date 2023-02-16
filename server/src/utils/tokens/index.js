@@ -11,4 +11,13 @@ module.exports = {
       { expiresIn: quantityUnit + timeUnit }
     ));
   },
+
+  async verifyAccessToken(accessToken) {
+    const { payload } = jwt.verify(
+      accessToken,
+      process.env.JWT_SECRET_KEY
+    );
+
+    return payload.user.id;
+  },
 };
