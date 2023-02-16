@@ -13,7 +13,7 @@ router.get(
 
 router.get(
   '/users/:userId',
-  authenticationMiddlewares.bearer,
+  [authenticationMiddlewares.bearer, authorization('users', 'read')],
   userController.findById
 );
 

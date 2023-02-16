@@ -38,6 +38,9 @@ module.exports = {
   async findById(req, res, next) {
     try {
       const { userId } = req.params;
+      if (!req.access.any.allowed && userId != req.user.id) {
+        throw new Unauthorized(UserNotAuthorized);
+      }
       const user = await userServices.getOneData({
         id: userId,
       });
