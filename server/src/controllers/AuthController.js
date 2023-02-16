@@ -1,3 +1,4 @@
+const { UserSuccessLogin } = require('../utils/constants');
 const { createAccessToken } = require('../utils/tokens');
 
 module.exports = {
@@ -9,7 +10,11 @@ module.exports = {
         [15, 'm']
       );
 
-      return res.json({ success: true, return: { accessToken } });
+      return res.json({
+        success: true,
+        return: UserSuccessLogin,
+        data: { accessToken },
+      });
     } catch (error) {
       next(error);
     }

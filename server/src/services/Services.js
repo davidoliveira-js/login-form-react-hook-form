@@ -10,10 +10,8 @@ class Services {
       const data = await database[this._model].findAll({
         where: { ...where },
       });
-      console.log(data);
       return data;
     } catch (error) {
-      console.log(error);
       return false;
     }
   }

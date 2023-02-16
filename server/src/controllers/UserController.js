@@ -1,7 +1,10 @@
 const { UserServices } = require('../services');
 const bcrypt = require('bcrypt');
 const userServices = new UserServices('User');
-const { NotFound } = require('../utils/error-handler/Exceptions');
+const {
+  NotFound,
+  Unauthorized,
+} = require('../utils/error-handler/Exceptions');
 const {
   DataNotFound,
   DataSuccessUpdate,
@@ -10,15 +13,22 @@ const {
   DataFailedDelete,
   DataSuccessRestored,
   DataFailedRestored,
+  DataFound,
+  DataSuccessCreate,
+  UserNotAuthorized,
 } = require('../utils/constants');
 
 module.exports = {
   async findAll(req, res, next) {
     try {
+      if (!req.access.any.allowed) {
+        throw new Unauthorized(UserNotAuthorized);
+      }
       const users = await userServices.getAllData();
       return res.status(200).json({
         success: true,
-        return: users,
+        return: DataFound,
+        data: users,
       });
     } catch (error) {
       next(error);
@@ -38,9 +48,8 @@ module.exports = {
 
       return res.status(200).json({
         success: true,
-        return: {
-          user,
-        },
+        return: DataFound,
+        data: user,
       });
     } catch (error) {
       next(error);
@@ -50,7 +59,6 @@ module.exports = {
   async store(req, res, next) {
     try {
       const { email, password } = req.body;
-
       const newUser = await userServices.createOneData({
         email,
         password: await bcrypt.hash(password, 12),
@@ -58,7 +66,8 @@ module.exports = {
 
       return res.status(200).json({
         success: true,
-        return: newUser,
+        return: DataSuccessCreate,
+        data: newUser,
       });
     } catch (error) {
       next(error);
@@ -68,8 +77,10 @@ module.exports = {
   async update(req, res, next) {
     try {
       const { userId } = req.params;
+      if (!req.access.any.allowed && userId != req.user.id) {
+        throw new Unauthorized(UserNotAuthorized);
+      }
       const { email } = req.body;
-
       const updatedUser = await userServices.updateOneData(
         { email },
         userId
@@ -78,6 +89,7 @@ module.exports = {
       return res.status(200).json({
         success: updatedUser[0] ? true : false,
         return: updatedUser[0] ? DataSuccessUpdate : DataFailedUpdate,
+        data: null,
       });
     } catch (error) {
       next(error);
@@ -91,6 +103,7 @@ module.exports = {
       return res.status(200).json({
         success: deletedUser ? true : false,
         return: deletedUser ? DataSuccessDelete : DataFailedDelete,
+        data: null,
       });
     } catch (error) {
       next(error);
@@ -103,11 +116,10 @@ module.exports = {
       const restoredUser = await userServices.restoreData(userId);
       return res.status(200).json({
         success: restoredUser ? true : false,
-        return: {
-          message: restoredUser
-            ? DataSuccessRestored
-            : DataFailedRestored,
-        },
+        return: restoredUser
+          ? DataSuccessRestored
+          : DataFailedRestored,
+        data: null,
       });
     } catch (error) {
       next(error);
