@@ -4,6 +4,7 @@ const userServices = new UserServices('User');
 const {
   NotFound,
   Unauthorized,
+  InternalServerError,
 } = require('../utils/error-handler/Exceptions');
 const {
   DataNotFound,
@@ -16,6 +17,7 @@ const {
   DataFound,
   DataSuccessCreate,
   UserNotAuthorized,
+  StatusError,
 } = require('../utils/constants');
 
 module.exports = {

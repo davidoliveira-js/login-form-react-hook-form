@@ -10,4 +10,19 @@ router.post(
   authController.login
 );
 
+router.post(
+  '/auth/refresh-token',
+  authenticationMiddlewares.refresh,
+  authController.refreshToken
+);
+
+router.post(
+  '/auth/logout/:userId',
+  [
+    authenticationMiddlewares.bearer,
+    authenticationMiddlewares.refresh,
+  ],
+  authController.logout
+);
+
 module.exports = router;

@@ -27,7 +27,9 @@
     "sequelize": "^6.21.3",
     "validator": "^13.7.0",
     "morgan": "^1.10.0",
-    "winston": "^3.8.2"
+    "winston": "^3.8.2",
+    "ioredis": "^5.2.3",
+    "moment": "^2.29.4"
   },
   "devDependencies": {
     "dotenv": "^16.0.1",
