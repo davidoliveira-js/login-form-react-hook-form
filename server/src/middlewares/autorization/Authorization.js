@@ -2,7 +2,6 @@ const accessControl = require('./accessControl');
 const {
   Unauthorized,
 } = require('../../utils/error-handler/Exceptions');
-
 const { UserNotAuthorized } = require('../../utils/constants');
 
 const methods = {
@@ -36,7 +35,6 @@ module.exports = (entity, action) => (req, res, next) => {
   ) {
     throw new Unauthorized(UserNotAuthorized);
   }
-
   req.access = {
     any: {
       allowed: permissionAny.granted,
@@ -47,6 +45,5 @@ module.exports = (entity, action) => (req, res, next) => {
       attributes: permissioOwn.attributes,
     },
   };
-
   next();
 };

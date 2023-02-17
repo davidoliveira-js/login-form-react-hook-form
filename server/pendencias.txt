@@ -1,2 +1,0 @@
-banco (x)
-rotas create ()
