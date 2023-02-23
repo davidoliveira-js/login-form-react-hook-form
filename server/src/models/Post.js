@@ -1,41 +1,37 @@
 'use strict';
 
 module.exports = (sequelize, DataTypes) => {
-  const User = sequelize.define(
-    'User',
+  const Post = sequelize.define(
+    'Post',
     {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
         autoIncrement: true,
       },
-      email: {
+      title: {
         type: DataTypes.STRING,
       },
-      password: {
+      body: {
         type: DataTypes.STRING,
       },
-      role: {
-        type: DataTypes.STRING,
-      },
-      isEmailVerified: {
-        type: DataTypes.BOOLEAN,
+      userId: {
+        type: DataTypes.INTEGER,
+        foreignKey: true,
       },
     },
     {
       paranoid: true,
-      tableName: 'users',
+      tableName: 'posts',
       defaultScope: {
         where: {},
       },
     }
   );
-
-  User.associate = function (models) {
-    User.hasMany(models.Post, {
+  Post.associate = function (models) {
+    Post.belongsTo(models.User, {
       foreignKey: 'user_id',
     });
   };
-
-  return User;
+  return Post;
 };

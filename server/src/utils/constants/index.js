@@ -24,4 +24,5 @@ module.exports = {
   FieldError: 'Entrada inválida.',
   MissingFields: 'Preencha todos dos campos',
   StatusError: 'Falha interna do servidor.',
+  NotFoundMsg: 'Não encontrado.',
 };

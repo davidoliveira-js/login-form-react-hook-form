@@ -1,49 +1,49 @@
 const { Router } = require('express');
-const userController = require('../controllers/UserController');
+const postController = require('../controllers/PostController');
 const authenticationMiddlewares = require('../middlewares/authentication/AuthenticationMiddlewares');
 const authorization = require('../middlewares/autorization/Authorization');
 
 const router = Router();
 
 router.get(
-  '/users',
+  '/posts',
   // [authenticationMiddlewares.bearer, authorization('users', 'read')],
-  userController.findAll
+  postController.findAll
 );
 
 router.get(
-  '/users/:userId',
+  '/posts/:postId',
   // [authenticationMiddlewares.bearer, authorization('users', 'read')],
-  userController.findById
+  postController.findById
 );
 
-router.post('/users', userController.store);
+router.post('/posts', postController.store);
 
 router.put(
-  '/users/:userId',
+  '/posts/:postId',
   // [
   //   authenticationMiddlewares.bearer,
   //   authorization('users', 'update'),
   // ],
-  userController.update
+  postController.update
 );
 
 router.delete(
-  '/users/:userId',
+  '/posts/:postId',
   // [
   //   authenticationMiddlewares.bearer,
   //   authorization('users', 'delete'),
   // ],
-  userController.delete
+  postController.delete
 );
 
 router.post(
-  '/users/:userId',
+  '/posts/:postId',
   // [
   //   authenticationMiddlewares.bearer,
   //   authorization('users', 'create'),
   // ],
-  userController.restore
+  postController.restore
 );
 
 module.exports = router;

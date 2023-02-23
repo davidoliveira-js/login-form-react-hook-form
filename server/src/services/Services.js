@@ -5,14 +5,43 @@ class Services {
     this._model = model;
   }
 
-  async getAllData(where = {}) {
+  async getAllData({
+    where = {},
+    order = ['id', 'ASC'],
+    offset,
+    limit,
+  }) {
     try {
       const data = await database[this._model].findAll({
         where: { ...where },
+        order: [order],
+        offset: offset,
+        limit: limit,
       });
+
       return data;
     } catch (error) {
-      return false;
+      throw error;
+    }
+  }
+
+  async getAndCountAllData({
+    where = {},
+    order = ['id', 'ASC'],
+    offset,
+    limit,
+  }) {
+    try {
+      const data = await database[this._model].findAndCountAll({
+        where: { ...where },
+        order: [order],
+        offset: offset,
+        limit: limit - offset,
+      });
+
+      return data;
+    } catch (error) {
+      throw error;
     }
   }
 
@@ -22,7 +51,7 @@ class Services {
         where: { ...where },
       });
     } catch (error) {
-      return false;
+      throw error;
     }
   }
 
@@ -30,7 +59,7 @@ class Services {
     try {
       return database[this._model].create(data, transaction);
     } catch (error) {
-      return false;
+      throw error;
     }
   }
 
@@ -42,7 +71,7 @@ class Services {
         transaction
       );
     } catch (error) {
-      return false;
+      throw error;
     }
   }
 
@@ -55,7 +84,7 @@ class Services {
         transaction
       );
     } catch (error) {
-      return false;
+      throw error;
     }
   }
 
@@ -63,7 +92,7 @@ class Services {
     try {
       return database[this._model].restore({ where: { id: id } });
     } catch (error) {
-      return false;
+      throw error;
     }
   }
 }

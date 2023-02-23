@@ -18,20 +18,50 @@ const {
   DataSuccessCreate,
   UserNotAuthorized,
   StatusError,
+  NotFoundMsg,
 } = require('../utils/constants');
+
+function filterQueryFilters(queryFilters) {
+  const asArray = Object.entries(queryFilters);
+  const filtered = asArray.filter(
+    ([key, value]) => typeof value !== 'undefined'
+  );
+  return Object.fromEntries(filtered);
+}
 
 module.exports = {
   async findAll(req, res, next) {
     try {
-      if (!req.access.any.allowed) {
-        throw new Unauthorized(UserNotAuthorized);
-      }
-      const users = await userServices.getAllData();
-      return res.status(200).json({
-        success: true,
-        return: DataFound,
-        data: users,
+      // if (!req.access.any.allowed) {
+      //   throw new Unauthorized(UserNotAuthorized);
+      // }
+      const {
+        _end,
+        _order,
+        _sort,
+        _start,
+        role,
+        isEmailVerified,
+        email,
+      } = req.query;
+
+      const queryFilters = filterQueryFilters({
+        role: role,
+        isEmailVerified: isEmailVerified,
+        email: email,
       });
+
+      const users = await userServices.getAndCountAllData({
+        where: queryFilters,
+        order: [_sort, _order],
+        offset: _start,
+        limit: _end,
+      });
+
+      res.set('Access-Control-Expose-Headers', 'X-Total-Count');
+      res.set('X-Total-Count', `${users.count}`);
+
+      return res.status(200).json(users.rows);
     } catch (error) {
       next(error);
     }
@@ -40,9 +70,9 @@ module.exports = {
   async findById(req, res, next) {
     try {
       const { userId } = req.params;
-      if (!req.access.any.allowed && userId != req.user.id) {
-        throw new Unauthorized(UserNotAuthorized);
-      }
+      // if (!req.access.any.allowed && userId != req.user.id) {
+      //   throw new Unauthorized(UserNotAuthorized);
+      // }
       const user = await userServices.getOneData({
         id: userId,
       });
@@ -50,12 +80,7 @@ module.exports = {
       if (!user) {
         throw new NotFound(DataNotFound);
       }
-
-      return res.status(200).json({
-        success: true,
-        return: DataFound,
-        data: user,
-      });
+      return res.status(200).json(user);
     } catch (error) {
       next(error);
     }
@@ -70,9 +95,7 @@ module.exports = {
       });
 
       return res.status(200).json({
-        success: true,
-        return: DataSuccessCreate,
-        data: newUser,
+        id: newUser.id,
       });
     } catch (error) {
       next(error);
@@ -82,20 +105,19 @@ module.exports = {
   async update(req, res, next) {
     try {
       const { userId } = req.params;
-      if (!req.access.any.allowed && userId != req.user.id) {
-        throw new Unauthorized(UserNotAuthorized);
-      }
+      // if (!req.access.any.allowed && userId != req.user.id) {
+      //   throw new Unauthorized(UserNotAuthorized);
+      // }
       const { email } = req.body;
       const updatedUser = await userServices.updateOneData(
         { email },
         userId
       );
 
-      return res.status(200).json({
-        success: updatedUser[0] ? true : false,
-        return: updatedUser[0] ? DataSuccessUpdate : DataFailedUpdate,
-        data: null,
-      });
+      if (updatedUser[0]) {
+        return res.status(200).json({ id: userId });
+      }
+      throw new NotFound(NotFoundMsg);
     } catch (error) {
       next(error);
     }
@@ -105,11 +127,12 @@ module.exports = {
     try {
       const { userId } = req.params;
       const deletedUser = await userServices.deleteOneData(userId);
-      return res.status(200).json({
-        success: deletedUser ? true : false,
-        return: deletedUser ? DataSuccessDelete : DataFailedDelete,
-        data: null,
-      });
+      if (deletedUser) {
+        return res.status(200).json({
+          id: userId,
+        });
+      }
+      throw new NotFound(NotFoundMsg);
     } catch (error) {
       next(error);
     }
@@ -119,13 +142,12 @@ module.exports = {
     try {
       const { userId } = req.params;
       const restoredUser = await userServices.restoreData(userId);
-      return res.status(200).json({
-        success: restoredUser ? true : false,
-        return: restoredUser
-          ? DataSuccessRestored
-          : DataFailedRestored,
-        data: null,
-      });
+      if (restoredUser) {
+        return res.status(200).json({
+          id: userId,
+        });
+      }
+      throw new NotFound(NotFoundMsg);
     } catch (error) {
       next(error);
     }

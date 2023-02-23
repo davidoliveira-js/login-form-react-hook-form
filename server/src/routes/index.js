@@ -1,6 +1,7 @@
-const userRoutes = require('./UserRoutes');
-const authRoutes = require('./AuthRoutes');
+const UserRoutes = require('./UserRoutes');
+const PostRoutes = require('./PostRoutes');
+const AuthRoutes = require('./AuthRoutes');
 
 module.exports = (app) => {
-  app.use(userRoutes, authRoutes);
+  app.use(UserRoutes, AuthRoutes, PostRoutes);
 };
