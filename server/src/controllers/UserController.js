@@ -1,25 +1,9 @@
 const { UserServices } = require('../services');
 const bcrypt = require('bcrypt');
 const userServices = new UserServices('User');
-const {
-  NotFound,
-  Unauthorized,
-  InternalServerError,
-} = require('../utils/error-handler/Exceptions');
-const {
-  DataNotFound,
-  DataSuccessUpdate,
-  DataFailedUpdate,
-  DataSuccessDelete,
-  DataFailedDelete,
-  DataSuccessRestored,
-  DataFailedRestored,
-  DataFound,
-  DataSuccessCreate,
-  UserNotAuthorized,
-  StatusError,
-  NotFoundMsg,
-} = require('../utils/constants');
+const { NotFound } = require('../utils/error-handler/Exceptions');
+const { DataNotFound, NotFoundMsg } = require('../utils/constants');
+const { Op } = require('sequelize');
 
 function filterQueryFilters(queryFilters) {
   const asArray = Object.entries(queryFilters);
@@ -48,7 +32,9 @@ module.exports = {
       const queryFilters = filterQueryFilters({
         role: role,
         isEmailVerified: isEmailVerified,
-        email: email,
+        email: {
+          [Op.iLike]: `%${email ? email : ''}%`,
+        },
       });
 
       const users = await userServices.getAndCountAllData({

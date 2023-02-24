@@ -1,3 +1,4 @@
+const { Op } = require('sequelize');
 const database = require('../models');
 
 class Services {
@@ -38,7 +39,6 @@ class Services {
         offset: offset,
         limit: limit - offset,
       });
-
       return data;
     } catch (error) {
       throw error;
